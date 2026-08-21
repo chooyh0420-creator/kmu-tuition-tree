@@ -213,6 +213,37 @@
   }
 
   .table-section{ max-width:640px; margin:48px auto 0; padding:24px 20px 0; border-top:1px dashed var(--line); }
+
+  .reg-info-section{ margin:14px 0 16px; text-align:left; }
+  .reg-toggle{
+    width:100%; background:var(--paper); border:1.4px solid var(--gold);
+    color:#8A6417; font-size:12px; font-weight:800; padding:9px 12px;
+    border-radius:10px; cursor:pointer; display:flex; align-items:center;
+    justify-content:space-between; font-family:inherit;
+  }
+  .reg-toggle .chev{ transition:transform .2s ease; }
+  .reg-toggle.open .chev{ transform:rotate(180deg); }
+  .reg-table-wrap{ max-height:0; overflow:hidden; transition:max-height .35s ease; }
+  .reg-table-wrap.open{ max-height:400px; }
+  .reg-table{
+    width:100%; border-collapse:collapse; margin-top:8px;
+    font-size:10.5px; background:var(--paper);
+    border:1px solid var(--line); border-radius:8px; overflow:hidden;
+  }
+  .reg-table th{
+    background:var(--ink); color:#fff; font-weight:700;
+    padding:6px 8px; text-align:left;
+  }
+  .reg-table td{
+    padding:7px 8px; border-bottom:1px solid var(--line-soft);
+    vertical-align:top; line-height:1.55; color:var(--ink);
+  }
+  .reg-table tr:last-child td{ border-bottom:none; }
+  .reg-table td.label{
+    font-weight:800; background:var(--gold-soft); color:#8A6417;
+    white-space:nowrap;
+  }
+
   .table-toggle{
     width:100%; background:var(--paper); border:1px solid var(--line);
     color:var(--ink); font-size:12.5px; font-weight:700; padding:12px;
@@ -275,7 +306,46 @@
   <div class="head">
     <div class="eyebrow">계명대학교 · 장학복지팀</div>
     <h1>등록금, 언제 낼까요?</h1>
-    <p class="sub">질문의 <b style="color:var(--ink)">예 / 아니오</b>를 눌러보면 가지가 뻗어나가요.<br>다른 선택지도 눌러서 자유롭게 비교해볼 수 있어요 🌲</p>
+
+    <div class="reg-info-section">
+      <button class="reg-toggle open" id="regToggleBtn" onclick="toggleRegTable()">
+        <span>1. 등록일정</span><span class="chev">▾</span>
+      </button>
+      <div class="reg-table-wrap open" id="regTableWrap">
+        <table class="reg-table">
+          <thead><tr><th style="width:76px;">구분</th><th>정규등록</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="label">기간</td>
+              <td>2026. 8. 24.(월) 09:00 ~ 27.(목) 18:00</td>
+              <td>2026. 8. 27.(목) 18:00까지만 납부가능하며, 이후로는 입금이 되지 않음</td>
+            </tr>
+            <tr>
+              <td class="label">수납은행</td>
+              <td>iM뱅크, 기업은행 및 농협은행 전 영업점</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td class="label">납부방법</td>
+              <td>인터넷뱅킹, 폰뱅킹, CD/ATM기 및 은행창구</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td class="label">납부대상</td>
+              <td>2026학년도 2학기 재학생</td>
+              <td>복학 1차, 2차 신청자 및 학사학위취득 유예자 포함</td>
+            </tr>
+            <tr>
+              <td class="label">고지서 출력</td>
+              <td>2026. 8. 13.(목) 이후</td>
+              <td>고지서 출력 페이지에서 확인</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="sub">재학생인 경우, 위 등록기간에 납부하면 돼요.<br>단, <b style="color:var(--ink)">초과학기생, 졸업유예생</b>인 경우, 아래의 질문의 <b style="color:var(--ink)">예 / 아니오</b>를 눌러보면 가지가 뻗어나가서 등록금 납부 일자를 확인할 수 있어요.</p>
     <div class="toolbar">
       <button class="tool-btn" onclick="expandAll()">🌲 전체 펼쳐보기</button>
       <button class="tool-btn ghost" onclick="resetTree()">처음으로</button>
@@ -557,6 +627,13 @@ function findLiForKey(key){
 function toggleTable(){
   const wrap = document.getElementById('tableWrap');
   const btn = document.getElementById('toggleBtn');
+  wrap.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+function toggleRegTable(){
+  const wrap = document.getElementById('regTableWrap');
+  const btn = document.getElementById('regToggleBtn');
   wrap.classList.toggle('open');
   btn.classList.toggle('open');
 }
