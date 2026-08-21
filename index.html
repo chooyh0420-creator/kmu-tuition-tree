@@ -223,11 +223,41 @@
   .table-toggle.open .chev{ transform:rotate(180deg); }
   .full-table-wrap{ max-height:0; overflow:hidden; transition:max-height .35s ease; }
   .full-table-wrap.open{ max-height:700px; }
-  .full-table-inner{ padding-top:12px; }
-  .ft-scroll{ overflow-x:auto; border-radius:10px; border:1px solid var(--line); }
-  table.ft{ border-collapse:collapse; width:100%; min-width:460px; font-size:11px; background:var(--paper); }
-  table.ft th{ background:var(--ink); color:#fff; font-weight:700; padding:8px 6px; text-align:center; }
-  table.ft td{ padding:8px 6px; text-align:center; border-bottom:1px solid var(--line-soft); border-right:1px solid var(--line-soft); color:var(--ink); }
+  .full-table-inner{ padding-top:8px; }
+
+  .scroll-hint{
+    display:flex; align-items:center; justify-content:center; gap:5px;
+    font-size:10.5px; color:var(--gold); font-weight:700;
+    margin-bottom:6px;
+  }
+  .scroll-hint .arrow{ animation:nudge 1.4s ease-in-out infinite; }
+  @keyframes nudge{
+    0%,100%{ transform:translateX(0); }
+    50%{ transform:translateX(4px); }
+  }
+
+  .ft-outer{ position:relative; }
+  .ft-scroll{ overflow-x:auto; border-radius:10px; border:1px solid var(--line); -webkit-overflow-scrolling:touch; }
+  .ft-fade{
+    position:absolute; top:0; right:0; bottom:10px; width:26px;
+    background:linear-gradient(to right, transparent, var(--bg) 85%);
+    pointer-events:none; border-radius:0 10px 10px 0;
+    transition:opacity .2s ease;
+  }
+  .ft-fade.hide{ opacity:0; }
+
+  .ft-scrollbar-track{
+    height:5px; background:var(--line-soft); border-radius:3px;
+    margin-top:7px; position:relative; overflow:hidden;
+  }
+  .ft-scrollbar-thumb{
+    position:absolute; top:0; left:0; height:100%;
+    background:var(--gold); border-radius:3px;
+  }
+
+  table.ft{ border-collapse:collapse; width:100%; min-width:420px; font-size:10.5px; background:var(--paper); }
+  table.ft th{ background:var(--ink); color:#fff; font-weight:700; padding:6px 5px; text-align:center; }
+  table.ft td{ padding:6px 5px; text-align:center; border-bottom:1px solid var(--line-soft); border-right:1px solid var(--line-soft); color:var(--ink); }
   table.ft td.grp{ font-weight:700; }
   tr.grp-a td.grp{ background:var(--gold-soft); }
   tr.grp-b td.grp{ background:var(--brick-soft); }
@@ -532,26 +562,65 @@ function toggleTable(){
 }
 
 document.getElementById('tableInner').innerHTML = `
-  <div class="ft-scroll">
-  <table class="ft">
-    <thead>
-      <tr><th>구분</th><th>수강신청 조건</th><th>신청 필요 여부</th><th>등록금 납부일정</th></tr>
-    </thead>
-    <tbody>
-      <tr class="grp-a"><td class="grp" rowspan="3">졸업유예<br>신청자</td><td>수강신청 계획 없음</td><td class="no">❌ 신청 불요</td><td>8.24(월)~27(목)</td></tr>
-      <tr class="grp-a"><td>계획 있음 · 9학점 이내</td><td class="ok">⭕ 신청 필요</td><td>9.9(수)~11(금)</td></tr>
-      <tr class="grp-a"><td>계획 있음 · 10학점 이상</td><td class="no">❌ 신청 불요</td><td>9.9(수)~11(금)</td></tr>
-      <tr class="grp-b"><td class="grp" rowspan="4">졸업<br>결격자</td><td>계획 없음(졸업기준 미충족)</td><td class="ok">⭕ 신청 필요</td><td>9.9(수)~11(금)</td></tr>
-      <tr class="grp-b"><td>졸업논문(0학점)만 신청</td><td class="ok">⭕ 신청 필요</td><td>9.9(수)~11(금)</td></tr>
-      <tr class="grp-b"><td>계획 있음 · 9학점 이내</td><td class="ok">⭕ 신청 필요</td><td>9.9(수)~11(금)</td></tr>
-      <tr class="grp-b"><td>계획 있음 · 10학점 이상</td><td class="no">❌ 신청 불요</td><td>9.9(수)~11(금)</td></tr>
-    </tbody>
-  </table>
+  <div class="scroll-hint"><span>표를 좌우로 밀어보세요</span><span class="arrow">→</span></div>
+  <div class="ft-outer">
+    <div class="ft-scroll" id="ftScroll">
+    <table class="ft">
+      <thead>
+        <tr><th>구분</th><th>수강신청 조건</th><th>신청 필요 여부</th><th>등록금 납부일정</th></tr>
+      </thead>
+      <tbody>
+        <tr class="grp-a"><td class="grp" rowspan="3">졸업유예<br>신청자</td><td>수강신청 계획 없음</td><td class="no">❌ 신청 불요</td><td>8.24(월)~27(목)</td></tr>
+        <tr class="grp-a"><td>계획 있음 · 9학점 이내</td><td class="ok">⭕ 신청 필요</td><td>9.9(수)~11(금)</td></tr>
+        <tr class="grp-a"><td>계획 있음 · 10학점 이상</td><td class="no">❌ 신청 불요</td><td>9.9(수)~11(금)</td></tr>
+        <tr class="grp-b"><td class="grp" rowspan="4">졸업<br>결격자</td><td>계획 없음(졸업기준 미충족)</td><td class="ok">⭕ 신청 필요</td><td>9.9(수)~11(금)</td></tr>
+        <tr class="grp-b"><td>졸업논문(0학점)만 신청</td><td class="ok">⭕ 신청 필요</td><td>9.9(수)~11(금)</td></tr>
+        <tr class="grp-b"><td>계획 있음 · 9학점 이내</td><td class="ok">⭕ 신청 필요</td><td>9.9(수)~11(금)</td></tr>
+        <tr class="grp-b"><td>계획 있음 · 10학점 이상</td><td class="no">❌ 신청 불요</td><td>9.9(수)~11(금)</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="ft-fade" id="ftFade"></div>
   </div>
+  <div class="ft-scrollbar-track"><div class="ft-scrollbar-thumb" id="ftThumb"></div></div>
   <p class="ft-note">
     ※ 수강정정 종료 후 최종 수강학점이 9학점을 초과하면 학점등록 대상에서 제외되고 정규등록금을 납부해야 합니다.<br>
     ※ 수강포기 기간(9.21~9.30)에 수강신청한 과목을 포기하더라도 이미 납부한 금액은 반환되지 않습니다.
   </p>`;
+
+function setupTableScrollHint(){
+  const scrollEl = document.getElementById('ftScroll');
+  const thumb = document.getElementById('ftThumb');
+  const fade = document.getElementById('ftFade');
+  if(!scrollEl || !thumb) return;
+
+  function update(){
+    const maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
+    if(maxScroll <= 1){
+      thumb.style.width = '100%';
+      thumb.style.left = '0';
+      if(fade) fade.classList.add('hide');
+      return;
+    }
+    const ratio = scrollEl.clientWidth / scrollEl.scrollWidth;
+    const thumbWidth = Math.max(ratio * 100, 12);
+    const progress = scrollEl.scrollLeft / maxScroll;
+    const maxLeft = 100 - thumbWidth;
+    thumb.style.width = thumbWidth + '%';
+    thumb.style.left = (progress * maxLeft) + '%';
+    if(fade){
+      fade.classList.toggle('hide', progress > 0.96);
+    }
+  }
+  scrollEl.addEventListener('scroll', update);
+  window.addEventListener('resize', update);
+  update();
+  setTimeout(update, 400);
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(update);
+  }
+}
+setupTableScrollHint();
 
 initTree();
 
