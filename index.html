@@ -32,6 +32,8 @@
     color:var(--ink);
     min-height:100vh;
     padding:28px 0 60px;
+    word-break:keep-all;
+    overflow-wrap:break-word;
   }
   .head{max-width:640px; margin:0 auto 18px; padding:0 20px; text-align:center;}
   .eyebrow{font-size:12px; letter-spacing:.14em; font-weight:700; color:var(--gold); margin-bottom:6px;}
@@ -148,9 +150,9 @@
   .sector-desc{ font-size:9px; line-height:1.45; color:var(--ink-soft); }
 
   .sec-tag{
-    display:inline-block; font-size:9px; font-weight:800;
-    padding:3px 7px; border-radius:10px; margin-bottom:7px; letter-spacing:.01em;
-    text-align:left;
+    display:inline-block; font-size:8.5px; font-weight:800;
+    padding:3px 7px; border-radius:10px; margin-bottom:7px; letter-spacing:-0.01em;
+    text-align:left; white-space:nowrap;
   }
   .sec-tag.delay{ background:var(--gold-soft); color:#8A6417; }
   .sec-tag.fail{ background:var(--brick-soft); color:var(--brick); }
@@ -248,15 +250,15 @@
   </div>
 
   <div class="table-section">
-    <button class="table-toggle" id="toggleBtn" onclick="toggleTable()">
+    <button class="table-toggle open" id="toggleBtn" onclick="toggleTable()">
       <span>원본 안내표로 보기</span><span class="chev">▾</span>
     </button>
-    <div class="full-table-wrap" id="tableWrap">
+    <div class="full-table-wrap open" id="tableWrap">
       <div class="full-table-inner" id="tableInner"></div>
     </div>
   </div>
 
-  <p class="footer-note">2026학년도 2학기 · 8학기 이수자 기준(건축학과 10학기) 안내입니다.<br>정확한 개인별 사항은 학과 사무실 또는 장학복지팀으로 문의해주세요.</p>
+  <p class="footer-note">2026학년도 2학기 · 8학기 이수자 기준(건축학과 10학기) 안내입니다.<br>정확한 개인별 사항은 학과 사무실 또는 재무팀(053-580-6134)로 문의해주세요.</p>
 
 <script>
 const tree = {
@@ -276,7 +278,7 @@ const tree = {
     q: "이번 학기에 강의를 들으실 계획이 있으신가요?",
     sub: "교직이수 등",
     section: 'delay',
-    sectionTag: '🎓 졸업유예 섹션 · 졸업요건은 갖췄음',
+    sectionTag: '🎓 졸업유예 섹션 · 요건 갖춤',
     yes: 'delayCredit',
     no: {result:'delay_no_plan'}
   },
@@ -291,7 +293,7 @@ const tree = {
     q: "졸업학점을 채우기 위한 수강신청 계획이 있으신가요?",
     sub: "잔여 학점 이수 등",
     section: 'fail',
-    sectionTag: '📚 초과학기 섹션 · 졸업요건 미충족',
+    sectionTag: '📚 초과학기 섹션 · 요건 미충족',
     yes: 'failThesis',
     no: {result:'fail_no_plan'}
   },
