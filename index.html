@@ -205,7 +205,7 @@
     font-size:11.5px; color:var(--ink-soft); text-align:center; line-height:1.7;
   }
 
-  .table-section{ max-width:640px; margin:22px auto 0; padding:0 20px; }
+  .table-section{ max-width:640px; margin:48px auto 0; padding:24px 20px 0; border-top:1px dashed var(--line); }
   .table-toggle{
     width:100%; background:var(--paper); border:1px solid var(--line);
     color:var(--ink); font-size:12.5px; font-weight:700; padding:12px;
@@ -249,6 +249,8 @@
     <div class="tree" id="tree"></div>
   </div>
 
+  <p class="footer-note">2026학년도 2학기 · 8학기 이수자 기준(건축학과 10학기) 안내입니다.<br>정확한 개인별 사항은 학과 사무실 또는 재무팀(053-580-6134)로 문의해주세요.</p>
+
   <div class="table-section">
     <button class="table-toggle open" id="toggleBtn" onclick="toggleTable()">
       <span>원본 안내표로 보기</span><span class="chev">▾</span>
@@ -257,8 +259,6 @@
       <div class="full-table-inner" id="tableInner"></div>
     </div>
   </div>
-
-  <p class="footer-note">2026학년도 2학기 · 8학기 이수자 기준(건축학과 10학기) 안내입니다.<br>정확한 개인별 사항은 학과 사무실 또는 재무팀(053-580-6134)로 문의해주세요.</p>
 
 <script>
 const tree = {
