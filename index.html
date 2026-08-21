@@ -121,6 +121,32 @@
   .tnode.show{ opacity:1; transform:translateY(0) scale(1); }
   .tnode.root{ width:210px; border-color:var(--gold); border-width:2px; }
 
+  .tnode.sector-node{ width:280px; }
+  .sector-options{ display:flex; gap:8px; }
+  .sector-btn{
+    flex:1;
+    font-family:inherit;
+    background:#fff;
+    border-radius:11px;
+    padding:12px 8px 10px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:3px;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .sector-btn:hover{ transform:translateY(-2px); }
+  .sector-btn:active{ transform:scale(.97); }
+  .sector-btn.opt-delay{ border:1.6px solid var(--gold); }
+  .sector-btn.opt-delay:hover, .sector-btn.opt-delay.active{ background:var(--gold-soft); }
+  .sector-btn.opt-fail{ border:1.6px solid var(--brick); }
+  .sector-btn.opt-fail:hover, .sector-btn.opt-fail.active{ background:var(--brick-soft); }
+  .sector-icon{ font-size:20px; }
+  .sector-title{ font-family:'Noto Serif KR', serif; font-weight:900; font-size:13px; color:var(--ink); }
+  .sector-desc{ font-size:9px; line-height:1.45; color:var(--ink-soft); }
+
   .sec-tag{
     display:inline-block; font-size:9px; font-weight:800;
     padding:3px 7px; border-radius:10px; margin-bottom:7px; letter-spacing:.01em;
@@ -238,16 +264,16 @@ const tree = {
     q: "정규학기(8학기, 건축학과 10학기)를 모두 마치고 이번에 정상적으로 졸업하시나요?",
     sub: "2026학년도 2학기 기준",
     yes: {result:'graduate'},
-    no: 'delayCheck'
+    no: 'sectorChoice'
   },
-  delayCheck: {
-    q: "졸업요건은 갖췄지만, 졸업을 미루고 싶으신가요?",
-    sub: "졸업유예신청",
-    yes: 'delayPlan',
-    no: 'failPlan'
+  sectorChoice: {
+    type: 'sector',
+    q: "정규학기를 마치지 못하셨네요. 아래 두 경우 중 어디에 해당하시나요?",
+    delay: 'delayPlan',
+    fail: 'failPlan'
   },
   delayPlan: {
-    q: "2026학년도 2학기에 수강신청 계획이 있으신가요?",
+    q: "이번 학기에 강의를 들으실 계획이 있으신가요?",
     sub: "교직이수 등",
     section: 'delay',
     sectionTag: '🎓 졸업유예 섹션 · 졸업요건은 갖췄음',
@@ -255,15 +281,15 @@ const tree = {
     no: {result:'delay_no_plan'}
   },
   delayCredit: {
-    q: "신청 학점이 9학점 이내인가요?",
+    q: "신청하신 학점이 9학점 이내인가요?",
     sub: "",
     section: 'delay',
     yes: {result:'delay_under9'},
     no: {result:'delay_over10'}
   },
   failPlan: {
-    q: "2026학년도 2학기에 수강신청 계획이 있으신가요?",
-    sub: "졸업학점 미취득 등",
+    q: "졸업학점을 채우기 위한 수강신청 계획이 있으신가요?",
+    sub: "잔여 학점 이수 등",
     section: 'fail',
     sectionTag: '📚 초과학기 섹션 · 졸업요건 미충족',
     yes: 'failThesis',
@@ -277,7 +303,7 @@ const tree = {
     no: 'failCredit'
   },
   failCredit: {
-    q: "신청 학점이 9학점 이내인가요?",
+    q: "이번 학기 신청 학점, 9학점을 넘지 않나요?",
     sub: "",
     section: 'fail',
     yes: {result:'fail_under9'},
@@ -325,8 +351,35 @@ const treeEl = document.getElementById('tree');
 function buildTnode(key, isRoot){
   const node = tree[key];
   const wrap = document.createElement('div');
-  wrap.className = 'tnode' + (isRoot ? ' root' : '') + (node.section ? ` sec-${node.section}` : '');
   wrap.dataset.key = key;
+
+  if(node.type === 'sector'){
+    wrap.className = 'tnode sector-node' + (isRoot ? ' root' : '');
+    wrap.innerHTML = `
+      <div class="tnode-q">${node.q}</div>
+      <div class="sector-options">
+        <button class="sector-btn opt-delay" data-side="delay">
+          <span class="sector-icon">🎓</span>
+          <span class="sector-title">졸업유예</span>
+          <span class="sector-desc">졸업요건은 갖췄지만<br>본인 의사로 미루는 경우</span>
+        </button>
+        <button class="sector-btn opt-fail" data-side="fail">
+          <span class="sector-icon">📚</span>
+          <span class="sector-title">초과학기</span>
+          <span class="sector-desc">졸업요건(학점·외국어 등)을<br>아직 못 채운 경우</span>
+        </button>
+      </div>
+    `;
+    wrap.querySelectorAll('[data-side]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        btn.classList.add('active');
+        onAnswer(key, btn.dataset.side, wrap);
+      });
+    });
+    return wrap;
+  }
+
+  wrap.className = 'tnode' + (isRoot ? ' root' : '') + (node.section ? ` sec-${node.section}` : '');
   wrap.innerHTML = `
     ${node.sectionTag ? `<span class="sec-tag ${node.section}">${node.sectionTag}</span>` : ''}
     <div class="tnode-q">${node.q}</div>
@@ -442,14 +495,16 @@ async function autoExpand(key){
   const parentLi = findLiForKey(key);
   if(!parentLi) return;
   const wrap = parentLi.querySelector('.tnode');
-  const yesBtn = wrap.querySelector('.tbtn[data-side="yes"]');
-  const noBtn = wrap.querySelector('.tbtn[data-side="no"]');
-  if(yesBtn){ yesBtn.click(); await delay(260); }
-  if(noBtn){ noBtn.click(); await delay(260); }
-
   const node = tree[key];
-  if(typeof node.yes === 'string'){ await autoExpand(node.yes); }
-  if(typeof node.no === 'string'){ await autoExpand(node.no); }
+  const sides = node.type === 'sector' ? ['delay', 'fail'] : ['yes', 'no'];
+
+  for(const side of sides){
+    const btn = wrap.querySelector(`[data-side="${side}"]`);
+    if(btn){ btn.click(); await delay(260); }
+  }
+  for(const side of sides){
+    if(typeof node[side] === 'string'){ await autoExpand(node[side]); }
+  }
 }
 
 function findLiForKey(key){
