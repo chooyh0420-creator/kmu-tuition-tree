@@ -48,6 +48,13 @@
   .tool-btn.ghost{background:transparent; color:var(--ink-soft); border-color:var(--line);}
   .tool-btn:hover{opacity:.88;}
 
+  .visit-stats{
+    margin-top:12px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+  }
+  .visit-stats b{ color:var(--gold); font-weight:800; }
+
   .tree-scroll{
     overflow-x:auto;
     -webkit-overflow-scrolling:touch;
@@ -242,6 +249,9 @@
     <div class="toolbar">
       <button class="tool-btn" onclick="expandAll()">🌲 전체 펼쳐보기</button>
       <button class="tool-btn ghost" onclick="resetTree()">처음으로</button>
+    </div>
+    <div class="visit-stats" id="visitStats">
+      오늘 <b id="todayCount">-</b>명 · 누적 <b id="totalCount">-</b>명 방문
     </div>
   </div>
 
@@ -544,6 +554,23 @@ document.getElementById('tableInner').innerHTML = `
   </p>`;
 
 initTree();
+
+async function trackVisits(){
+  const todayKey = 'kmu-tuition-tree-daily-' + new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const totalKey = 'kmu-tuition-tree-total-v1';
+  try{
+    const [todayRes, totalRes] = await Promise.all([
+      fetch(`https://countapi.mileshilliard.com/api/v1/hit/${todayKey}`).then(r=>r.json()),
+      fetch(`https://countapi.mileshilliard.com/api/v1/hit/${totalKey}`).then(r=>r.json())
+    ]);
+    document.getElementById('todayCount').textContent = todayRes.value;
+    document.getElementById('totalCount').textContent = totalRes.value;
+  }catch(e){
+    const el = document.getElementById('visitStats');
+    if(el) el.style.display = 'none';
+  }
+}
+trackVisits();
 </script>
 </body>
 </html>
